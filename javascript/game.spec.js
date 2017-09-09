@@ -1,3 +1,5 @@
+var memoizedRandoms = [];
+
 function getConsoleOutputForSourceCode(codeToRun) {
     var consoleOutput = '';
     console.log = function (text) {
@@ -8,19 +10,25 @@ function getConsoleOutputForSourceCode(codeToRun) {
     return consoleOutput;
 }
 
+function saveEachRandomCall() {
+    var originalRandom = Math.random;
+    Math.random = function () {
+        var randomValue = originalRandom();
+        memoizedRandoms.push(randomValue);
+        return randomValue;
+    };
+}
 
-var memoizedRandoms = [];
-var originalRandom = Math.random;
-Math.random = function() {
-  var randomValue = originalRandom();
-  memoizedRandoms.push(randomValue);
-  return randomValue;
-};
+function replayEachSavedRandomCall() {
+    Math.random = function () {
+        return memoizedRandoms.shift();
+    };
+}
+
+saveEachRandomCall();
 var goldenMasterConsoleOutput = getConsoleOutputForSourceCode('./game-golden.js');
 
-Math.random = function() {
-    return memoizedRandoms.shift();
-};
+replayEachSavedRandomCall();
 var refactoredConsoleOutput = getConsoleOutputForSourceCode('./game.js');
 
 
