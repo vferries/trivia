@@ -1,9 +1,9 @@
 var memoizedRandoms = [];
 
 function getConsoleOutputForSourceCode(codeToRun) {
-    var consoleOutput = '';
+    var consoleOutput = [];
     console.log = function (text) {
-        consoleOutput += text + '\n'
+        consoleOutput.push(text);
     };
 
     require(codeToRun);
